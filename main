@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Link Barcode & QR Code Generator</title>
+  <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs/qrcode.min.js"></script>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Helvetica, Arial, sans-serif;
+      background-color: #f0f2f5;
+    }
+    .container {
+      max-width: 500px;
+      margin: 40px auto;
+      background-color: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      text-align: center;
+    }
+    h2 {
+      color: #1877f2;
+      margin-bottom: 20px;
+    }
+    input[type="text"], select {
+      width: 90%;
+      padding: 12px;
+      margin: 8px 0;
+      border: 1px solid #dddfe2;
+      border-radius: 6px;
+      font-size: 16px;
+    }
+    button {
+      width: 95%;
+      background-color: #1877f2;
+      color: white;
+      padding: 12px;
+      margin: 15px 0;
+      border: none;
+      border-radius: 6px;
+      font-size: 18px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #165fbe;
+    }
+    label {
+      display: block;
+      text-align: left;
+      margin: 10px 0 5px 5%;
+      font-size: 14px;
+      color: #606770;
+    }
+    #output {
+      margin-top: 20px;
+    }
+    canvas, svg, #qrcode {
+      margin-top: 20px;
+      display: inline-block;
+      max-width: 100%;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Bar/QR Code Generator by Reymarc Jason</h2>
+    <input type="text" id="linkInput" placeholder="Enter your link here" />
+    <select id="codeType" onchange="toggleOptions()">
+      <option value="barcode">Barcode</option>
+      <option value="qrcode">QR Code</option>
+    </select>
+    
+    <label id="showTextLabel">
+      <input type="checkbox" id="showTextCheckbox" checked> Show text below barcode
+    </label>
+    <label id="customTextLabel">
+      Custom text under barcode:
+      <input type="text" id="customTextInput" placeholder="Optional custom text" />
+    </label>
+
+    <button onclick="generateCode()">Generate</button>
+    
+    <div id="output"></div>
+  </div>
+
+  <script>
+    function toggleOptions() {
+      const type = document.getElementById('codeType').value;
+      const showTextLabel = document.getElementById('showTextLabel');
+      const customTextLabel = document.getElementById('customTextLabel');
+      if (type === 'barcode') {
+        showTextLabel.style.display = 'block';
+        customTextLabel.style.display = 'block';
+      } else {
+        showTextLabel.style.display = 'none';
+        customTextLabel.style.display = 'none';
+      }
+    }
+
+    function generateCode() {
+      const link = document.getElementById('linkInput').value.trim();
+      const type = document.getElementById('codeType').value;
+      const showText = document.getElementById('showTextCheckbox').checked;
+      const customText = document.getElementById('customTextInput').value.trim();
+      const output = document.getElementById('output');
+      output.innerHTML = ''; // Clear previous
+
+      if (!link) {
+        alert('Please enter a link!');
+        return;
+      }
+
+      if (type === 'barcode') {
+        const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        JsBarcode(svg, link, {
+          format: "CODE128",
+          lineColor: "#000",
+          width: 2,
+          height: 100,
+          displayValue: showText,
+          text: customText || undefined
+        });
+        output.appendChild(svg);
+      } else if (type === 'qrcode') {
+        const qrDiv = document.createElement('div');
+        qrDiv.id = 'qrcode';
+        output.appendChild(qrDiv);
+        new QRCode(qrDiv, {
+          text: link,
+          width: 200,
+          height: 200
+        });
+      }
+    }
+
+    // Initialize on load
+    toggleOptions();
+  </script>
+</body>
+</html>
